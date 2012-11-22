@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace ProjectM01
+namespace MATPaint
 {
     static class Program
     {

@@ -1,4 +1,4 @@
-﻿namespace ProjectM01
+﻿namespace MATPaint
 {
     partial class Form1
     {

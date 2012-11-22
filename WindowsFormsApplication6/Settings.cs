@@ -1,4 +1,4 @@
-﻿namespace ProjectM01.Properties {
+﻿namespace MATPaint.Properties {
     
     
     // This class allows you to handle specific events on the settings class:

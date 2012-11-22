@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 
-namespace ProjectM01
+namespace MATPaint
 {
     public partial class Form1 : Form
     {

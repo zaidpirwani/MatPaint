@@ -8,8 +8,8 @@
     <ProjectGuid>{97435844-BF5B-4560-9E94-BE41D22F5DFE}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProjectM01</RootNamespace>
-    <AssemblyName>WindowsFormsApplication6</AssemblyName>
+    <RootNamespace>MATPaint</RootNamespace>
+    <AssemblyName>MATPaint</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
