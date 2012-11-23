@@ -16,8 +16,9 @@ namespace MATPaint
         // to BE DONE....
         enum FileStatus { New, Open};
         FileStatus currentFile = FileStatus.New;
-        bool isSaved = false;
         bool isChanged = false;
+        string matrixFileName = null;
+
 
         public Form1()
         {
@@ -46,17 +47,7 @@ namespace MATPaint
 
         private void bt_MatrixCreate_Click(object sender, EventArgs e)
         {
-            dataGridView1.ColumnCount = int.Parse(cmbx_Column.Text);
-            dataGridView1.RowCount = int.Parse(cmbx_Row.Text);
-            dataGridView1.CurrentCell.Selected = false;
-            dataGridView1.DefaultCellStyle.BackColor = Color.White;
-            UpdateMatrixCellSize();
-
-            if (dataGridView1.RowCount == dataGridView1.ColumnCount)
-            {
-                bt_RotateAnticlock.Enabled = true;
-                bt_RotataClock.Enabled = true;
-            }
+            NewMatrix();
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -66,6 +57,7 @@ namespace MATPaint
             else
                 dataGridView1.CurrentCell.Style.BackColor = Color.White;
             dataGridView1.CurrentCell.Selected = false;
+            isChanged = true;
         }
 
         private void cmbx_Grid_SelectedIndexChanged(object sender, EventArgs e)
@@ -136,9 +128,7 @@ namespace MATPaint
         {
             for (int z = 0; z < dataGridView1.RowCount; z++)
                 for (int y = 0; y < dataGridView1.ColumnCount; y++)
-                {
                     dataGridView1.Rows[z].Cells[y].Style.BackColor = Color.White;
-                }
         }
 
         // Mirror - on horizontal plane
@@ -208,6 +198,69 @@ namespace MATPaint
 
         private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
         {
+            if (currentFile == FileStatus.New)
+                SaveMatrix();
+            else if (currentFile == FileStatus.Open)
+                SaveOpenMatrix();
+        }
+
+        private void openToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (isChanged == true && currentFile == FileStatus.New)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveMatrix();
+                    OpenMatrix();
+                }
+                else if (z == DialogResult.No)
+                    OpenMatrix();
+            }
+            else if (isChanged == true && currentFile == FileStatus.Open)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveOpenMatrix();
+                    OpenMatrix();
+                }
+                else if (z == DialogResult.No)
+                    OpenMatrix();
+            }
+            else
+                OpenMatrix();
+        }
+
+        private void newToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (isChanged == true && currentFile == FileStatus.New)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveMatrix();
+                    NewMatrix();
+                }
+                else if (z == DialogResult.No)
+                    NewMatrix();
+            }
+            else if (isChanged == true && currentFile == FileStatus.Open)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveOpenMatrix();
+                    NewMatrix();
+                }
+                else if (z == DialogResult.No)
+                    NewMatrix();
+            }
+            else if (isChanged == false)
+                NewMatrix();
+        }
+
+        private void SaveMatrix() {
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 string matrixCode = "";
@@ -232,32 +285,39 @@ namespace MATPaint
                 TextWriter tw = new StreamWriter(saveFileDialog1.FileName);
                 tw.Write(matrixCode);
                 tw.Close();
+
+                matrixFileName = saveFileDialog1.FileName;
+                isChanged = false;
+                currentFile = FileStatus.Open;
+                this.Text = "MATPaint - " + matrixFileName;
             }
         }
 
-        private void openToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void OpenMatrix()
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                    // Open FILE SPECIFCIATIONS
-                    // File should be in simple TXT format, ',' delimited
-                    // First Line: ColumnCount, RowCount
-                    // Second Line and so on: Each line has data of 8 rows in INT format and commas separate the different Columns
-                    TextReader tr = new StreamReader(openFileDialog1.FileName);
-                    string matrixCode = tr.ReadToEnd();
-                    string[] cellDataS = matrixCode.Split(new char[] { ',', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    int[] cellData = new int[cellDataS.Length];
-                    int count = 0;
-                    foreach (string s in cellDataS)
-                        cellData[count++] = Convert.ToInt16(s);
+                // Open FILE SPECIFCIATIONS
+                // File should be in simple TXT format, ',' delimited
+                // First Line: ColumnCount, RowCount
+                // Second Line and so on: Each line has data of 8 rows in INT format and commas separate the different Columns
+                TextReader tr = new StreamReader(openFileDialog1.FileName);
+                string matrixCode = tr.ReadToEnd();
+                tr.Close();
+                string[] cellDataS = matrixCode.Split(new char[] { ',', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                int[] cellData = new int[cellDataS.Length];
+                int count = 0;
+                foreach (string s in cellDataS)
+                    cellData[count++] = Convert.ToInt16(s);
 
-                    int row = cellData[1], col = cellData[0], page = 0, z = 0;
+                int row = cellData[1], col = cellData[0], page = 0, z = 0;
 
-                    count = 1;
-                    dataGridView1.ColumnCount = col;
-                    dataGridView1.RowCount = row;
-                    bt_Clear_Click(this, EventArgs.Empty);
-
+                count = 1;
+                dataGridView1.ColumnCount = col;
+                dataGridView1.RowCount = row;
+                bt_Clear_Click(this, EventArgs.Empty);
+                try
+                {
                     for (page = 0; page <= row / 8; page++)
                         for (col = 0; col < dataGridView1.ColumnCount; col++)
                         {
@@ -266,15 +326,66 @@ namespace MATPaint
                                 if (dataGridView1.RowCount > (page * 8) + row)
                                     if ((z & Convert.ToInt16(Math.Pow(2.0, row))) > 0)
                                         dataGridView1.Rows[(page * 8) + row].Cells[col].Style.BackColor = Color.Black;
+                        }
                 }
+                catch { }
                 dataGridView1.ClearSelection();
+                matrixFileName = openFileDialog1.FileName;
+                isChanged = false;
+                currentFile = FileStatus.Open;
+
+                this.Text = "MATPaint - " + matrixFileName;
             }
         }
 
-        private void newToolStripMenuItem1_Click(object sender, EventArgs e)
+        private void SaveOpenMatrix()
         {
+            string matrixCode = "";
+            matrixCode = dataGridView1.ColumnCount.ToString() + "," + dataGridView1.RowCount.ToString() + "\r\n";
+            int row = 0, col = 0, page = 0, z = 0;
+            for (page = 0; page <= dataGridView1.RowCount / 8; page++)
+            {
+                for (col = 0; col < dataGridView1.ColumnCount; col++)
+                {
+                    for (row = 0; row < 8; row++)
+                    {
+                        if (dataGridView1.RowCount > (page * 8) + row)
+                            if (dataGridView1.Rows[(page * 8) + row].Cells[col].Style.BackColor == Color.Black)
+                                z = z + Convert.ToInt16(Math.Pow(2.0, row));
+                        z += 0;
+                    }
+                    matrixCode = matrixCode + z.ToString() + ",";
+                    z = 0;
+                }
+                matrixCode = matrixCode + "\r\n";
+            }
+            TextWriter tw = new StreamWriter(matrixFileName);
+            tw.Write(matrixCode);
+            tw.Close();
 
+            isChanged = false;
+            currentFile = FileStatus.Open;
+        }
+
+        private void NewMatrix()
+        {
+            dataGridView1.ColumnCount = int.Parse(cmbx_Column.Text);
+            dataGridView1.RowCount = int.Parse(cmbx_Row.Text);
+            for (int z = 0; z < dataGridView1.RowCount; z++)
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[z].Cells[y].Style.BackColor = Color.White;
+
+            dataGridView1.CurrentCell.Selected = false;
+            dataGridView1.DefaultCellStyle.BackColor = Color.White;
+            UpdateMatrixCellSize();            
+            if (dataGridView1.RowCount == dataGridView1.ColumnCount)
+            {
+                bt_RotateAnticlock.Enabled = true;
+                bt_RotataClock.Enabled = true;
+            }
+
+            currentFile = FileStatus.New;
+            isChanged = false;
         }
     }
-
 }
