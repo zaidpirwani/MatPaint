@@ -22,5 +22,101 @@ namespace MATPaint.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
+        public global::System.Drawing.Point appLocation {
+            get {
+                return ((global::System.Drawing.Point)(this["appLocation"]));
+            }
+            set {
+                this["appLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Normal")]
+        public global::System.Windows.Forms.FormWindowState appState {
+            get {
+                return ((global::System.Windows.Forms.FormWindowState)(this["appState"]));
+            }
+            set {
+                this["appState"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
+        public global::System.Drawing.Size appSize {
+            get {
+                return ((global::System.Drawing.Size)(this["appSize"]));
+            }
+            set {
+                this["appSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16")]
+        public int MatCols {
+            get {
+                return ((int)(this["MatCols"]));
+            }
+            set {
+                this["MatCols"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public int MatRows {
+            get {
+                return ((int)(this["MatRows"]));
+            }
+            set {
+                this["MatRows"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Recent1 {
+            get {
+                return ((string)(this["Recent1"]));
+            }
+            set {
+                this["Recent1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Recent2 {
+            get {
+                return ((string)(this["Recent2"]));
+            }
+            set {
+                this["Recent2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Recent3 {
+            get {
+                return ((string)(this["Recent3"]));
+            }
+            set {
+                this["Recent3"] = value;
+            }
+        }
     }
 }

@@ -19,16 +19,78 @@ namespace MATPaint
         bool isChanged = false;
         string matrixFileName = null;
 
-
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void Form1_Load(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
-            this.ShowInTaskbar = true;
+            this.Location = Properties.Settings.Default.appLocation;
+            this.WindowState = Properties.Settings.Default.appState;
+            this.Size = Properties.Settings.Default.appSize;
+            num_Col.Value = Properties.Settings.Default.MatCols;
+            num_Row.Value = Properties.Settings.Default.MatRows;
+            recent1toolStripMenuItem.Text = Properties.Settings.Default.Recent1;
+            recent2toolStripMenuItem.Text = Properties.Settings.Default.Recent2;
+            recent3toolStripMenuItem.Text = Properties.Settings.Default.Recent3;
+
+            bt_RotataClock.Enabled = false;
+            bt_RotateAnticlock.Enabled = false;
+            currentFile = FileStatus.New;
+            NewMatrix();
+
+            // Tooltip 
+            System.Windows.Forms.ToolTip ToolTip1 = new System.Windows.Forms.ToolTip();
+            ToolTip1.SetToolTip(this.num_Col, "Select the Width");
+            ToolTip1.SetToolTip(this.num_Row, "Select the Height");
+            ToolTip1.SetToolTip(this.cmbx_Grid, "Select the size of the block");
+            ToolTip1.SetToolTip(this.bt_MatrixCreate, "To create and display the matrix of provided parameters");
+            ToolTip1.SetToolTip(this.bt_Clear, "Clear the matrix data");
+            ToolTip1.SetToolTip(this.bt_Invert, "Invert the matrix");
+            ToolTip1.SetToolTip(this.bt_Mirror, "Create the mirror of the matrix");
+            ToolTip1.SetToolTip(this.bt_Flip, "Turn over the matrix");
+            ToolTip1.SetToolTip(this.bt_RotateAnticlock, "Rotate anticlockwise by 90 deg");
+            ToolTip1.SetToolTip(this.bt_RotataClock, "Rotate clockwise by 90 deg");
+            ToolTip1.SetToolTip(this.bt_RotataClock, "Rotate clockwise by 90 deg");
+            ToolTip1.SetToolTip(this.bt_RotataClock, "Rotate clockwise by 90 deg");
+            ToolTip1.SetToolTip(this.bt_RotataClock, "Rotate clockwise by 90 deg");
+            ToolTip1.SetToolTip(this.cbx_GridRoll, "Choose whether to rotate/roll the grid");
+            ToolTip1.SetToolTip(this.bt_Up, "Move up in the grid");
+            ToolTip1.SetToolTip(this.bt_Down, "Move down in the grid");
+            ToolTip1.SetToolTip(this.bt_Left, "Move left in the grid");
+            ToolTip1.SetToolTip(this.bt_Right, "Move right in the grid");
+
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (isChanged == true && currentFile == FileStatus.New)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                    SaveMatrix();
+                else if (z == DialogResult.Cancel)
+                    e.Cancel = true;
+            }
+            else if (isChanged == true && currentFile == FileStatus.Open)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                    SaveOpenMatrix();
+                else if (z == DialogResult.Cancel)
+                    e.Cancel = true;
+            }
+
+            Properties.Settings.Default.appLocation = this.Location;
+            Properties.Settings.Default.appState = this.WindowState;
+            Properties.Settings.Default.appSize = this.Size;
+            Properties.Settings.Default.MatCols = Convert.ToInt16(num_Col.Value);
+            Properties.Settings.Default.MatRows = Convert.ToInt16(num_Row.Value);
+            Properties.Settings.Default.Recent1 = recent1toolStripMenuItem.Text;
+            Properties.Settings.Default.Recent2 = recent2toolStripMenuItem.Text;
+            Properties.Settings.Default.Recent3 = recent3toolStripMenuItem.Text;
+            Properties.Settings.Default.Save();
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -44,10 +106,39 @@ namespace MATPaint
                 this.ShowInTaskbar = true;
             }
         }
+        
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+        }
 
         private void bt_MatrixCreate_Click(object sender, EventArgs e)
         {
-            NewMatrix();
+            if (isChanged == true && currentFile == FileStatus.New)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveMatrix();
+                    NewMatrix();
+                }
+                else if (z == DialogResult.No)
+                    NewMatrix();
+            }
+            else if (isChanged == true && currentFile == FileStatus.Open)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveOpenMatrix();
+                    NewMatrix();
+                }
+                else if (z == DialogResult.No)
+                    NewMatrix();
+            }
+            else if (isChanged == false)
+                NewMatrix();
         }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -112,7 +203,6 @@ namespace MATPaint
                 dataGridView1.Columns[z].Width = ColumnWidth;
         }
 
-        // Inverting - black to white and vice versa
         private void bt_Invert_Click(object sender, EventArgs e)
         {
             for (int z = 0; z < dataGridView1.RowCount; z++)
@@ -121,9 +211,9 @@ namespace MATPaint
                         dataGridView1.Rows[z].Cells[y].Style.BackColor = Color.Black;
                     else
                         dataGridView1.Rows[z].Cells[y].Style.BackColor = Color.White;
+            isChanged = true;
         }
 
-        // Clear all grid data
         private void bt_Clear_Click(object sender, EventArgs e)
         {
             for (int z = 0; z < dataGridView1.RowCount; z++)
@@ -131,7 +221,6 @@ namespace MATPaint
                     dataGridView1.Rows[z].Cells[y].Style.BackColor = Color.White;
         }
 
-        // Mirror - on horizontal plane
         private void bt_Mirror_Click(object sender, EventArgs e)
         {
             int x = dataGridView1.ColumnCount - 1;
@@ -142,9 +231,9 @@ namespace MATPaint
                     dataGridView1.Rows[z].Cells[y].Style.BackColor = dataGridView1.Rows[z].Cells[x - y].Style.BackColor;
                     dataGridView1.Rows[z].Cells[x - y].Style.BackColor = temp;                    
                 }
+            isChanged = true;
         }
 
-        // Flip  - on vertical plane
         private void bt_Flip_Click(object sender, EventArgs e)
         {
             int x = dataGridView1.RowCount - 1;
@@ -155,6 +244,7 @@ namespace MATPaint
                     dataGridView1.Rows[z].Cells[y].Style.BackColor = dataGridView1.Rows[x - z].Cells[y].Style.BackColor;
                     dataGridView1.Rows[x - z].Cells[y].Style.BackColor = temp;
                 }
+            isChanged = true;
         }
 
         private void bt_RotateAnticlock_Click(object sender, EventArgs e)
@@ -170,7 +260,8 @@ namespace MATPaint
             // Rotating anticlockwise by 90 deg
             for (int z = 0; z < dataGridView1.RowCount; z++)
                 for (int y = 0; y < dataGridView1.ColumnCount; y++)
-                    dataGridView1.Rows[z].Cells[y].Style.BackColor = GridArray[y, x - z];        
+                    dataGridView1.Rows[z].Cells[y].Style.BackColor = GridArray[y, x - z];
+            isChanged = true;
         }
 
         private void bt_RotataClock_Click(object sender, EventArgs e)
@@ -187,49 +278,7 @@ namespace MATPaint
             for (int z = 0; z < dataGridView1.RowCount; z++)
                 for (int y = 0; y < dataGridView1.ColumnCount; y++)
                     dataGridView1.Rows[z].Cells[y].Style.BackColor = GridArray[x - y, z];
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            bt_RotataClock.Enabled = false;
-            bt_RotateAnticlock.Enabled = false;
-            currentFile = FileStatus.New;
-        }
-
-        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            if (currentFile == FileStatus.New)
-                SaveMatrix();
-            else if (currentFile == FileStatus.Open)
-                SaveOpenMatrix();
-        }
-
-        private void openToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            if (isChanged == true && currentFile == FileStatus.New)
-            {
-                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
-                if (z == DialogResult.Yes)
-                {
-                    SaveMatrix();
-                    OpenMatrix();
-                }
-                else if (z == DialogResult.No)
-                    OpenMatrix();
-            }
-            else if (isChanged == true && currentFile == FileStatus.Open)
-            {
-                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
-                if (z == DialogResult.Yes)
-                {
-                    SaveOpenMatrix();
-                    OpenMatrix();
-                }
-                else if (z == DialogResult.No)
-                    OpenMatrix();
-            }
-            else
-                OpenMatrix();
+            isChanged = true;
         }
 
         private void newToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -260,7 +309,75 @@ namespace MATPaint
                 NewMatrix();
         }
 
-        private void SaveMatrix() {
+        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (currentFile == FileStatus.New)
+                SaveMatrix();
+            else if (currentFile == FileStatus.Open)
+                SaveOpenMatrix();
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveMatrix();
+        }
+
+        private void openToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (isChanged == true && currentFile == FileStatus.New)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveMatrix();
+                    OpenMatrix();
+                }
+                else if (z == DialogResult.No)
+                    OpenMatrix();
+            }
+            else if (isChanged == true && currentFile == FileStatus.Open)
+            {
+                DialogResult z = MessageBox.Show("Do you want to SAVE the current Pattern", "Save Pattern", MessageBoxButtons.YesNoCancel);
+                if (z == DialogResult.Yes)
+                {
+                    SaveOpenMatrix();
+                    OpenMatrix();
+                }
+                else if (z == DialogResult.No)
+                    OpenMatrix();
+            }
+            else
+                OpenMatrix();
+        }
+
+        private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+                    this.Close();
+        }
+
+        private void NewMatrix()
+        {
+            dataGridView1.ColumnCount = Convert.ToInt16(num_Col.Value);
+            dataGridView1.RowCount = Convert.ToInt16(num_Row.Value);
+            for (int z = 0; z < dataGridView1.RowCount; z++)
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[z].Cells[y].Style.BackColor = Color.White;
+
+            dataGridView1.CurrentCell.Selected = false;
+            dataGridView1.DefaultCellStyle.BackColor = Color.White;
+            UpdateMatrixCellSize();
+            if (dataGridView1.RowCount == dataGridView1.ColumnCount)
+            {
+                bt_RotateAnticlock.Enabled = true;
+                bt_RotataClock.Enabled = true;
+            }
+            UpdateMatrixCellSize();
+            currentFile = FileStatus.New;
+            isChanged = false;
+        }
+
+        private void SaveMatrix()
+        {
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 string matrixCode = "";
@@ -290,54 +407,10 @@ namespace MATPaint
                 isChanged = false;
                 currentFile = FileStatus.Open;
                 this.Text = "MATPaint - " + matrixFileName;
+                saveFileDialog1.FileName = "";
             }
         }
-
-        private void OpenMatrix()
-        {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                // Open FILE SPECIFCIATIONS
-                // File should be in simple TXT format, ',' delimited
-                // First Line: ColumnCount, RowCount
-                // Second Line and so on: Each line has data of 8 rows in INT format and commas separate the different Columns
-                TextReader tr = new StreamReader(openFileDialog1.FileName);
-                string matrixCode = tr.ReadToEnd();
-                tr.Close();
-                string[] cellDataS = matrixCode.Split(new char[] { ',', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                int[] cellData = new int[cellDataS.Length];
-                int count = 0;
-                foreach (string s in cellDataS)
-                    cellData[count++] = Convert.ToInt16(s);
-
-                int row = cellData[1], col = cellData[0], page = 0, z = 0;
-
-                count = 1;
-                dataGridView1.ColumnCount = col;
-                dataGridView1.RowCount = row;
-                bt_Clear_Click(this, EventArgs.Empty);
-                try
-                {
-                    for (page = 0; page <= row / 8; page++)
-                        for (col = 0; col < dataGridView1.ColumnCount; col++)
-                        {
-                            z = cellData[++count];
-                            for (row = 0; row < 8; row++)
-                                if (dataGridView1.RowCount > (page * 8) + row)
-                                    if ((z & Convert.ToInt16(Math.Pow(2.0, row))) > 0)
-                                        dataGridView1.Rows[(page * 8) + row].Cells[col].Style.BackColor = Color.Black;
-                        }
-                }
-                catch { }
-                dataGridView1.ClearSelection();
-                matrixFileName = openFileDialog1.FileName;
-                isChanged = false;
-                currentFile = FileStatus.Open;
-
-                this.Text = "MATPaint - " + matrixFileName;
-            }
-        }
-
+        
         private void SaveOpenMatrix()
         {
             string matrixCode = "";
@@ -365,27 +438,236 @@ namespace MATPaint
 
             isChanged = false;
             currentFile = FileStatus.Open;
+            saveFileDialog1.FileName = "";
         }
 
-        private void NewMatrix()
+        private void OpenMatrix(string matrixFileNameToOpen = null)
         {
-            dataGridView1.ColumnCount = int.Parse(cmbx_Column.Text);
-            dataGridView1.RowCount = int.Parse(cmbx_Row.Text);
-            for (int z = 0; z < dataGridView1.RowCount; z++)
-                for (int y = 0; y < dataGridView1.ColumnCount; y++)
-                    dataGridView1.Rows[z].Cells[y].Style.BackColor = Color.White;
+            bool readFile = false;
+            openFileDialog1.FileName = matrixFileNameToOpen;
+            
+            if(matrixFileNameToOpen != null)
+                readFile = true;
+            else if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                readFile = true;
 
-            dataGridView1.CurrentCell.Selected = false;
-            dataGridView1.DefaultCellStyle.BackColor = Color.White;
-            UpdateMatrixCellSize();            
-            if (dataGridView1.RowCount == dataGridView1.ColumnCount)
+            if (readFile == true)
             {
-                bt_RotateAnticlock.Enabled = true;
-                bt_RotataClock.Enabled = true;
-            }
+                // Open FILE SPECIFCIATIONS
+                // File should be in simple TXT format, ',' delimited
+                // First Line: ColumnCount, RowCount
+                // Second Line and so on: Each line has data of 8 rows in INT format and commas separate the different Columns
+                try
+                {
+                    TextReader tr = new StreamReader(openFileDialog1.FileName);
+                    string matrixCode = tr.ReadToEnd();
+                    tr.Close();
+                    string[] cellDataS = matrixCode.Split(new char[] { ',', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    int[] cellData = new int[cellDataS.Length];
+                    int count = 0;
+                    foreach (string s in cellDataS)
+                        cellData[count++] = Convert.ToInt16(s);
 
-            currentFile = FileStatus.New;
-            isChanged = false;
+                    int row = cellData[1], col = cellData[0], page = 0, z = 0;
+
+                    count = 1;
+                    dataGridView1.ColumnCount = col;
+                    dataGridView1.RowCount = row;
+                    bt_Clear_Click(this, EventArgs.Empty);
+                    try
+                    {
+                        for (page = 0; page <= row / 8; page++)
+                            for (col = 0; col < dataGridView1.ColumnCount; col++)
+                            {
+                                z = cellData[++count];
+                                for (row = 0; row < 8; row++)
+                                    if (dataGridView1.RowCount > (page * 8) + row)
+                                        if ((z & Convert.ToInt16(Math.Pow(2.0, row))) > 0)
+                                            dataGridView1.Rows[(page * 8) + row].Cells[col].Style.BackColor = Color.Black;
+                            }
+                    }
+                    catch { }
+                    dataGridView1.ClearSelection();
+                    matrixFileName = openFileDialog1.FileName;
+                    isChanged = false;
+                    currentFile = FileStatus.Open;
+                    num_Col.Value = dataGridView1.ColumnCount;
+                    num_Row.Value = dataGridView1.RowCount;
+                    if (matrixFileName != recent1toolStripMenuItem.Text
+                        && matrixFileName != recent2toolStripMenuItem.Text
+                        && matrixFileName != recent3toolStripMenuItem.Text)
+                    {
+                        recent3toolStripMenuItem.Text = recent2toolStripMenuItem.Text;
+                        recent2toolStripMenuItem.Text = recent1toolStripMenuItem.Text;
+                        recent1toolStripMenuItem.Text = matrixFileName;
+                    }
+                    this.Text = "MATPaint - " + matrixFileName;
+                }
+                catch { MessageBox.Show("Cannot Read File", "File Read Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            }
+            else
+                MessageBox.Show("Cannot Read File", "File Read Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void bt_ChngMatrixSize_Click(object sender, EventArgs e)
+        {
+            int tmpCol = Convert.ToInt16(num_Col.Value);
+            int tmpRow = Convert.ToInt16(num_Row.Value);
+            if ((tmpCol < dataGridView1.ColumnCount) || (tmpRow < dataGridView1.RowCount))
+            {
+                if (MessageBox.Show("The New Size is Smaller than current Size, some Clipping may occur, \nContinue ?", "Resize Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                {
+                    dataGridView1.ColumnCount = tmpCol;
+                    dataGridView1.RowCount = tmpRow;
+                    UpdateMatrixCellSize();
+                }
+            }
+            else
+            {
+                dataGridView1.ColumnCount = tmpCol;
+                dataGridView1.RowCount = tmpRow;
+                UpdateMatrixCellSize();
+            }
+        }
+
+        private void bt_Up_Click(object sender, EventArgs e)
+        {
+            // Storing the data of the critical Row 0 - the first row
+            Color[] temp = new Color[dataGridView1.ColumnCount];
+            for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                temp[y] = dataGridView1.Rows[0].Cells[y].Style.BackColor;
+
+            // Moving the rest of the grid UP
+            for (int z = 0; z < dataGridView1.RowCount - 1; z++)
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[z].Cells[y].Style.BackColor = dataGridView1.Rows[z + 1].Cells[y].Style.BackColor;
+
+            // Checking whether to roll or shift the grid UP
+            if (cbx_GridRoll.Checked == true)
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[dataGridView1.RowCount - 1].Cells[y].Style.BackColor = temp[y];
+            else
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[dataGridView1.RowCount - 1].Cells[y].Style.BackColor = Color.White;
+        }
+
+        private void bt_Down_Click(object sender, EventArgs e)
+        {
+            // Storing the data of the critical Row - the last row
+            Color[] temp = new Color[dataGridView1.ColumnCount];
+            for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                temp[y] = dataGridView1.Rows[dataGridView1.RowCount - 1].Cells[y].Style.BackColor;
+
+            // Moving the rest of the grid DOWN
+            for (int z = dataGridView1.RowCount - 1; z > 0; z--)
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[z].Cells[y].Style.BackColor = dataGridView1.Rows[z - 1].Cells[y].Style.BackColor;
+
+            // Checking whether to roll or shift the grid DOWN
+            if (cbx_GridRoll.Checked == true)
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[0].Cells[y].Style.BackColor = temp[y];
+            else
+                for (int y = 0; y < dataGridView1.ColumnCount; y++)
+                    dataGridView1.Rows[0].Cells[y].Style.BackColor = Color.White;
+        }
+
+        private void bt_Left_Click(object sender, EventArgs e)
+        {
+            // Storing the data of the critical Column 0 - the first column
+            Color[] temp = new Color[dataGridView1.RowCount];
+            for (int x = 0; x < dataGridView1.RowCount; x++)
+                temp[x] = dataGridView1.Rows[x].Cells[0].Style.BackColor;
+
+            // Moving the rest of the grid to the LEFT
+            for (int y = 0; y < dataGridView1.ColumnCount - 1; y++)
+                for (int x = 0; x < dataGridView1.RowCount; x++)
+                    dataGridView1.Rows[x].Cells[y].Style.BackColor = dataGridView1.Rows[x].Cells[y + 1].Style.BackColor;
+
+            // Checking whether to roll or shift the grid to the LEFT
+            if (cbx_GridRoll.Checked == true)
+                for (int x = 0; x < dataGridView1.RowCount; x++)
+                    dataGridView1.Rows[x].Cells[dataGridView1.ColumnCount - 1].Style.BackColor = temp[x];
+            else
+                for (int x = 0; x < dataGridView1.RowCount; x++)
+                    dataGridView1.Rows[x].Cells[dataGridView1.ColumnCount - 1].Style.BackColor = Color.White;
+        }
+
+        private void bt_Right_Click(object sender, EventArgs e)
+        {
+            // Storing the data of the critical Column 0 - the last column
+            Color[] temp = new Color[dataGridView1.RowCount];
+            for (int x = 0; x < dataGridView1.RowCount; x++)
+                temp[x] = dataGridView1.Rows[x].Cells[dataGridView1.ColumnCount - 1].Style.BackColor;
+
+            // Moving the rest of the grid to the LEFT
+            for (int y = dataGridView1.ColumnCount - 1; y > 0; y--)
+                for (int x = 0; x < dataGridView1.RowCount; x++)
+                    dataGridView1.Rows[x].Cells[y].Style.BackColor = dataGridView1.Rows[x].Cells[y - 1].Style.BackColor;
+
+            // Checking whether to roll or shift the grid to the RIGHT
+            if (cbx_GridRoll.Checked == true)
+                for (int x = 0; x < dataGridView1.RowCount; x++)
+                    dataGridView1.Rows[x].Cells[0].Style.BackColor = temp[x];
+            else
+                for (int x = 0; x < dataGridView1.RowCount; x++)
+                    dataGridView1.Rows[x].Cells[0].Style.BackColor = Color.White;
+
+
+        }
+
+        private void recent1toolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMatrix(recent1toolStripMenuItem.Text);
+        }
+
+        private void recent2toolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMatrix(recent2toolStripMenuItem.Text);
+        }
+
+        private void recent3toolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenMatrix(recent3toolStripMenuItem.Text);
+        }
+
+        private void exportPNGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Bitmap matrixPNG = new Bitmap(dataGridView1.Width, dataGridView1.Height);
+            dataGridView1.DrawToBitmap(matrixPNG, dataGridView1.ClientRectangle);
+
+            saveFileDialog1.Filter = "PNG Image File|*.png";
+            saveFileDialog1.Title = "Save PNG Screenshot";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                matrixPNG.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            saveFileDialog1.Filter = "Matrix Pattern Files|*.maz";
+            saveFileDialog1.Title = "Save Pattern File";
+            saveFileDialog1.FileName = "";
+        }
+
+        private void printPreviewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            printPreviewDialog1.Document = printDocument1;
+            printPreviewDialog1.ShowDialog();
+        }
+
+        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (printDialog1.ShowDialog() == DialogResult.OK)
+                printDocument1.Print();
+        }
+
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            Bitmap matrixPNG = new Bitmap(dataGridView1.Width, dataGridView1.Height);
+            dataGridView1.DrawToBitmap(matrixPNG, dataGridView1.ClientRectangle);
+            e.Graphics.DrawImage(matrixPNG, new Point(0,0));
+        }
+
+        private void helpToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(" MATPaint - MATrix Paint\n Made by:\n Zaid Pirwani and Maaz Ahmed\n\nas class project for C# Course (OOP)\ntaught by Engr. Sajid Hussain\nat\nIIEE PCSIR","About BOX",MessageBoxButtons.OK,MessageBoxIcon.Information);
+
         }
     }
 }
