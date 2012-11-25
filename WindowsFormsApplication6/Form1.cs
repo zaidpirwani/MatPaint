@@ -374,6 +374,7 @@ namespace MATPaint
             UpdateMatrixCellSize();
             currentFile = FileStatus.New;
             isChanged = false;
+            this.Text = "MATPaint - ";
         }
 
         private void SaveMatrix()
@@ -493,6 +494,18 @@ namespace MATPaint
                     currentFile = FileStatus.Open;
                     num_Col.Value = dataGridView1.ColumnCount;
                     num_Row.Value = dataGridView1.RowCount;
+
+                    if (dataGridView1.RowCount == dataGridView1.ColumnCount)
+                    {
+                        bt_RotateAnticlock.Enabled = true;
+                        bt_RotataClock.Enabled = true;
+                    }
+                    else
+                    {
+                        bt_RotateAnticlock.Enabled = false;
+                        bt_RotataClock.Enabled = false;
+                    }
+
                     if (matrixFileName != recent1toolStripMenuItem.Text
                         && matrixFileName != recent2toolStripMenuItem.Text
                         && matrixFileName != recent3toolStripMenuItem.Text)
@@ -505,8 +518,6 @@ namespace MATPaint
                 }
                 catch { MessageBox.Show("Cannot Read File", "File Read Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
             }
-            else
-                MessageBox.Show("Cannot Read File", "File Read Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void bt_ChngMatrixSize_Click(object sender, EventArgs e)
@@ -520,6 +531,7 @@ namespace MATPaint
                     dataGridView1.ColumnCount = tmpCol;
                     dataGridView1.RowCount = tmpRow;
                     UpdateMatrixCellSize();
+                    isChanged = true;
                 }
             }
             else
@@ -527,6 +539,16 @@ namespace MATPaint
                 dataGridView1.ColumnCount = tmpCol;
                 dataGridView1.RowCount = tmpRow;
                 UpdateMatrixCellSize();
+                isChanged = true;
+            }
+            if (dataGridView1.RowCount == dataGridView1.ColumnCount)
+            {
+                bt_RotateAnticlock.Enabled = true;
+                bt_RotataClock.Enabled = true;
+            }
+            else {
+                bt_RotateAnticlock.Enabled = false;
+                bt_RotataClock.Enabled = false;
             }
         }
 
@@ -631,20 +653,6 @@ namespace MATPaint
             OpenMatrix(recent3toolStripMenuItem.Text);
         }
 
-        private void exportPNGToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Bitmap matrixPNG = new Bitmap(dataGridView1.Width, dataGridView1.Height);
-            dataGridView1.DrawToBitmap(matrixPNG, dataGridView1.ClientRectangle);
-
-            saveFileDialog1.Filter = "PNG Image File|*.png";
-            saveFileDialog1.Title = "Save PNG Screenshot";
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                matrixPNG.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Png);
-            saveFileDialog1.Filter = "Matrix Pattern Files|*.maz";
-            saveFileDialog1.Title = "Save Pattern File";
-            saveFileDialog1.FileName = "";
-        }
-
         private void printPreviewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             printPreviewDialog1.Document = printDocument1;
@@ -668,6 +676,52 @@ namespace MATPaint
         {
             MessageBox.Show(" MATPaint - MATrix Paint\n Made by:\n Zaid Pirwani and Maaz Ahmed\n\nas class project for C# Course (OOP)\ntaught by Engr. Sajid Hussain\nat\nIIEE PCSIR","About BOX",MessageBoxButtons.OK,MessageBoxIcon.Information);
 
+        }
+
+        private void imagePNGToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Bitmap matrixPNG = new Bitmap(dataGridView1.Width, dataGridView1.Height);
+            dataGridView1.DrawToBitmap(matrixPNG, dataGridView1.ClientRectangle);
+
+            saveFileDialog1.Filter = "PNG Image File|*.png";
+            saveFileDialog1.Title = "Save PNG Screenshot";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                matrixPNG.Save(saveFileDialog1.FileName, System.Drawing.Imaging.ImageFormat.Png);
+            saveFileDialog1.Filter = "Matrix Pattern Files|*.maz";
+            saveFileDialog1.Title = "Save Pattern File";
+            saveFileDialog1.FileName = "";
+        }
+
+        private void binaryCodeHEXToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveFileDialog1.Filter = "Binary Code File |*.hex";
+            saveFileDialog1.Title = "Save Pattern Hex Code";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                using (FileStream hex = new FileStream(saveFileDialog1.FileName, FileMode.Create))
+                {
+                    using (BinaryWriter writer = new BinaryWriter(hex))
+                    {
+                        int row = 0, col = 0, page = 0;
+                        byte z=0;
+                        for (page = 0; page <= dataGridView1.RowCount / 8; page++)
+                            for (col = 0; col < dataGridView1.ColumnCount; col++)
+                            {
+                                for (row = 0; row < 8; row++)
+                                {
+                                    if (dataGridView1.RowCount > (page * 8) + row)
+                                        if (dataGridView1.Rows[(page * 8) + row].Cells[col].Style.BackColor == Color.Black)
+                                            z = Convert.ToByte(z + Math.Pow(2.0, row));
+                                    z += 0;
+                                }
+                                writer.Write(z);
+                                z = 0;
+                            }
+                        writer.Close();
+                    }
+                }
+            saveFileDialog1.Filter = "Matrix Pattern Files|*.maz";
+            saveFileDialog1.Title = "Save Pattern File";
+            saveFileDialog1.FileName = "";
         }
     }
 }

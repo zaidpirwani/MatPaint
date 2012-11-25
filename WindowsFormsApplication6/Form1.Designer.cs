@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.BottomToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.TopToolStripPanel = new System.Windows.Forms.ToolStripPanel();
             this.RightToolStripPanel = new System.Windows.Forms.ToolStripPanel();
@@ -66,7 +66,7 @@
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-            this.exportPNGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bt_ChngMatrixSize = new System.Windows.Forms.Button();
             this.num_Col = new System.Windows.Forms.NumericUpDown();
             this.num_Row = new System.Windows.Forms.NumericUpDown();
@@ -79,6 +79,8 @@
             this.printPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
             this.printDocument1 = new System.Drawing.Printing.PrintDocument();
             this.printDialog1 = new System.Windows.Forms.PrintDialog();
+            this.imagePNGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.binaryCodeHEXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.num_Col)).BeginInit();
@@ -164,14 +166,14 @@
             this.dataGridView1.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.ColumnHeadersVisible = false;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView1.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridView1.Location = new System.Drawing.Point(0, 78);
             this.dataGridView1.MultiSelect = false;
@@ -411,7 +413,7 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem1,
-            this.exportPNGToolStripMenuItem,
+            this.exportAsToolStripMenuItem,
             this.helpToolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -419,12 +421,14 @@
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
-            // exportPNGToolStripMenuItem
+            // exportAsToolStripMenuItem
             // 
-            this.exportPNGToolStripMenuItem.Name = "exportPNGToolStripMenuItem";
-            this.exportPNGToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
-            this.exportPNGToolStripMenuItem.Text = "Export PNG";
-            this.exportPNGToolStripMenuItem.Click += new System.EventHandler(this.exportPNGToolStripMenuItem_Click);
+            this.exportAsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.imagePNGToolStripMenuItem,
+            this.binaryCodeHEXToolStripMenuItem});
+            this.exportAsToolStripMenuItem.Name = "exportAsToolStripMenuItem";
+            this.exportAsToolStripMenuItem.Size = new System.Drawing.Size(68, 20);
+            this.exportAsToolStripMenuItem.Text = "Export As";
             // 
             // bt_ChngMatrixSize
             // 
@@ -549,6 +553,20 @@
             this.printDialog1.ShowNetwork = false;
             this.printDialog1.UseEXDialog = true;
             // 
+            // imagePNGToolStripMenuItem
+            // 
+            this.imagePNGToolStripMenuItem.Name = "imagePNGToolStripMenuItem";
+            this.imagePNGToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.imagePNGToolStripMenuItem.Text = "Image PNG";
+            this.imagePNGToolStripMenuItem.Click += new System.EventHandler(this.imagePNGToolStripMenuItem_Click);
+            // 
+            // binaryCodeHEXToolStripMenuItem
+            // 
+            this.binaryCodeHEXToolStripMenuItem.Name = "binaryCodeHEXToolStripMenuItem";
+            this.binaryCodeHEXToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.binaryCodeHEXToolStripMenuItem.Text = "Binary Code HEX";
+            this.binaryCodeHEXToolStripMenuItem.Click += new System.EventHandler(this.binaryCodeHEXToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -640,7 +658,9 @@
         private System.Windows.Forms.PrintPreviewDialog printPreviewDialog1;
         private System.Drawing.Printing.PrintDocument printDocument1;
         private System.Windows.Forms.PrintDialog printDialog1;
-        private System.Windows.Forms.ToolStripMenuItem exportPNGToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem imagePNGToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem binaryCodeHEXToolStripMenuItem;
 
 
 
