@@ -23,6 +23,10 @@ namespace MATPaint
         {
             InitializeComponent();
         }
+        public Form1(string matrixFileNameARG) {
+            InitializeComponent();
+            matrixFileName = matrixFileNameARG;
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -37,8 +41,18 @@ namespace MATPaint
 
             bt_RotataClock.Enabled = false;
             bt_RotateAnticlock.Enabled = false;
-            currentFile = FileStatus.New;
-            NewMatrix();
+            if (matrixFileName != null)
+            {
+                OpenMatrix(matrixFileName);
+                currentFile = FileStatus.Open;
+                isChanged = false;
+            }
+            else
+            {
+                currentFile = FileStatus.New;
+                NewMatrix();
+            }
+            UpdateMatrixCellSize();
 
             // Tooltip 
             System.Windows.Forms.ToolTip ToolTip1 = new System.Windows.Forms.ToolTip();
