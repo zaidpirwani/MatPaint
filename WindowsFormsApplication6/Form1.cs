@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
@@ -38,7 +37,6 @@ namespace MATPaint
             recent1toolStripMenuItem.Text = Properties.Settings.Default.Recent1;
             recent2toolStripMenuItem.Text = Properties.Settings.Default.Recent2;
             recent3toolStripMenuItem.Text = Properties.Settings.Default.Recent3;
-
             bt_RotataClock.Enabled = false;
             bt_RotateAnticlock.Enabled = false;
             if (matrixFileName != null)
